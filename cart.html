@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart - BookNest</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Navbar -->
+    <nav class="bg-indigo-700 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+
+            <a href="index.html" class="text-2xl font-bold">
+                📚 BookNest
+            </a>
+
+            <div class="flex items-center gap-6">
+                <a href="index.html" class="hover:text-yellow-300">
+                    Home
+                </a>
+
+                <a href="books.html" class="hover:text-yellow-300">
+                    Books
+                </a>
+
+                <a href="cart.html" class="hover:text-yellow-300 font-semibold">
+                    🛒 Cart
+                    <span id="cartCount"
+                          class="bg-yellow-400 text-black px-2 py-1 rounded-full text-xs">
+                        0
+                    </span>
+                </a>
+
+                <a href="login.html" class="hover:text-yellow-300">
+                    Login
+                </a>
+            </div>
+
+        </div>
+    </nav>
+
+
+    <!-- Cart Header -->
+    <section class="bg-indigo-100 py-12">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+
+            <h1 class="text-4xl font-bold text-gray-900">
+                Your Shopping Cart
+            </h1>
+
+            <p class="text-gray-600 mt-3">
+                Review your books before checkout.
+            </p>
+
+        </div>
+    </section>
+
+
+    <!-- Cart Section -->
+    <section class="max-w-7xl mx-auto px-6 py-12">
+
+        <div id="emptyCart"
+             class="hidden bg-white rounded-xl shadow p-12 text-center">
+
+            <div class="text-7xl mb-5">
+                🛒
+            </div>
+
+            <h2 class="text-2xl font-bold">
+                Your cart is empty
+            </h2>
+
+            <p class="text-gray-500 mt-2">
+                Add some books to your cart first.
+            </p>
+
+            <a href="books.html"
+               class="inline-block mt-6 bg-indigo-600 text-white
+                      px-6 py-3 rounded-lg font-semibold
+                      hover:bg-indigo-800">
+                Browse Books
+            </a>
+
+        </div>
+
+
+        <div id="cartContent"
+             class="grid lg:grid-cols-3 gap-8">
+
+            <!-- Cart Items -->
+            <div class="lg:col-span-2">
+
+                <div class="bg-white rounded-xl shadow">
+
+                    <div class="p-6 border-b">
+                        <h2 class="text-2xl font-bold">
+                            Cart Items
+                        </h2>
+                    </div>
+
+                    <div id="cartItems">
+                        <!-- Items inserted by JavaScript -->
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Order Summary -->
+            <div>
+
+                <div class="bg-white rounded-xl shadow p-6">
+
+                    <h2 class="text-2xl font-bold mb-6">
+                        Order Summary
+                    </h2>
+
+                    <div class="flex justify-between mb-4">
+                        <span class="text-gray-600">
+                            Subtotal
+                        </span>
+
+                        <span id="subtotal"
+                              class="font-semibold">
+                            ₹0
+                        </span>
+                    </div>
+
+                    <div class="flex justify-between mb-4">
+                        <span class="text-gray-600">
+                            Delivery
+                        </span>
+
+                        <span class="text-green-600 font-semibold">
+                            FREE
+                        </span>
+                    </div>
+
+                    <div class="border-t pt-4 flex justify-between">
+
+                        <span class="text-lg font-bold">
+                            Total
+                        </span>
+
+                        <span id="total"
+                              class="text-xl font-bold text-indigo-600">
+                            ₹0
+                        </span>
+
+                    </div>
+
+
+                    <button onclick="checkout()"
+                            class="w-full mt-6 bg-indigo-600 text-white
+                                   py-3 rounded-lg font-bold
+                                   hover:bg-indigo-800 transition">
+                        Proceed to Checkout
+                    </button>
+
+
+                    <a href="books.html"
+                       class="block text-center mt-4
+                              text-indigo-600 hover:underline">
+                        Continue Shopping
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8">
+
+        <div class="max-w-7xl mx-auto px-6 text-center">
+
+            <h2 class="text-xl font-bold">
+                📚 BookNest
+            </h2>
+
+            <p class="text-gray-400 mt-2">
+                Your favorite online bookstore.
+            </p>
+
+            <p class="text-gray-500 mt-4">
+                © 2026 BookNest. All rights reserved.
+            </p>
+
+        </div>
+
+    </footer>
+
+
+    <!-- JavaScript -->
+    <script>
+
+        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+
+        function displayCart() {
+
+            const cartItems = document.getElementById("cartItems");
+            const emptyCart = document.getElementById("emptyCart");
+            const cartContent = document.getElementById("cartContent");
+
+            const cartCount = document.getElementById("cartCount");
+
+            cartCount.textContent = cart.length;
+
+
+            if (cart.length === 0) {
+
+                emptyCart.classList.remove("hidden");
+                cartContent.classList.add("hidden");
+
+                return;
+            }
+
+
+            emptyCart.classList.add("hidden");
+            cartContent.classList.remove("hidden");
+
+
+            cartItems.innerHTML = "";
+
+            let total = 0;
+
+
+            cart.forEach((book, index) => {
+
+                total += Number(book.price);
+
+
+                cartItems.innerHTML += `
+
+                    <div class="p-6 border-b flex flex-col sm:flex-row
+                                justify-between gap-5">
+
+                        <div class="flex items-center gap-5">
+
+                            <div class="w-20 h-24 bg-indigo-100
+                                        rounded-lg flex items-center
+                                        justify-center text-4xl">
+                                📚
+                            </div>
+
+                            <div>
+
+                                <h3 class="text-lg font-bold">
+                                    ${book.name}
+                                </h3>
+
+                                <p class="text-gray-500">
+                                    ${book.author || "BookNest"}
+                                </p>
+
+                                <p class="text-indigo-600 font-bold mt-2">
+                                    ₹${book.price}
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <button onclick="removeItem(${index})"
+                                class="text-red-500 font-semibold
+                                       hover:text-red-700">
+                            Remove
+                        </button>
+
+                    </div>
+
+                `;
+            });
+
+
+            document.getElementById("subtotal").textContent =
+                "₹" + total;
+
+            document.getElementById("total").textContent =
+                "₹" + total;
+        }
+
+
+        function removeItem(index) {
+
+            cart.splice(index, 1);
+
+            localStorage.setItem(
+                "cart",
+                JSON.stringify(cart)
+            );
+
+            displayCart();
+        }
+
+
+        function checkout() {
+
+            if (cart.length === 0) {
+
+                alert("Your cart is empty.");
+
+                return;
+            }
+
+
+            const firstBook = cart[0];
+
+            window.location.href =
+                "payment.html?book=" +
+                encodeURIComponent(firstBook.name) +
+                "&price=" +
+                firstBook.price;
+        }
+
+
+        displayCart();
+
+    </script>
+
+</body>
+</html>
